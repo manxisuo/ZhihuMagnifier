@@ -33,7 +33,7 @@ var btnWidth = btn.width();
 
 // 鼠标移入头像图片事件的监听函数
 var avatarHoverHandler = function(arguments) {
-    var avatars = $('.avatar img, img.avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50');
+    var avatars = $('img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50');
     avatars.off('mouseover').on('mouseover', function(e) {
         var img = $(this);
         var offset = img.offset();
@@ -45,6 +45,16 @@ var avatarHoverHandler = function(arguments) {
             top: offset.top + img.height() + 5
         });
     });
+/*    $('.avatar img, img.avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50').mouseout(function(){
+        btn.hide();
+    })*/
+    avatars.off('mouseout').on('mouseout',function(e){
+        btn.hide();
+    });
+};
+var HaveHandler=function(arguments){
+    var avatars = $('.avatar img, img.avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50');
+
 };
 
 // 知乎首页动态插入节点(新动态)事件的监听函数：为所有头像图片的鼠标移入事件注册监听器
