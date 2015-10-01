@@ -37,9 +37,9 @@ var avatarHoverHandler = function(arguments) {
     avatars.off('mouseover').on('mouseover', function(e) {
         var img = $(this);
         var offset = img.offset();
-        
+
         imgUrl = img.attr('src').replace((/_\w\./), '.');
-        
+
         btn.show().offset({
             left: offset.left + (img.width() - btnWidth) / 2,
             top: offset.top + img.height() + 5
@@ -54,7 +54,7 @@ var avatarHoverHandler = function(arguments) {
         var ts = new Date().getTime();
 
         // 防止一次插入多个节点时触发多次注册动作
-        if (-1 === ts || ts - ts0 >= 500) {      
+        if (ts - ts0 >= 500) {
             setTimeout(avatarHoverHandler); // 加入到事件队列的末尾
         }
 
@@ -69,6 +69,11 @@ btn.on('click', function() {
     btn.hide();
     mask.show();
     win.show();
+});
+
+// 鼠标移出"点击放大"按钮事件的监听函数：隐藏按钮
+btn.on('mouseout', function() {
+    btn.hide();
 });
 
 // 点击图片弹窗事件事件的监听函数：隐藏弹窗
