@@ -16,7 +16,7 @@ var maskTpl = '<div class="modal-dialog-bg zm-light-box-background" style="opaci
 var winTpl = '<div class="modal-dialog zm-light-box zm-light-box-fullscreen-image" tabindex="0" role="dialog" aria-labelledby=":9h"><div class="modal-dialog-title modal-dialog-title-draggable"><span class="modal-dialog-title-text" id=":9h" role="heading"></span><span class="modal-dialog-title-close" role="button" tabindex="0" aria-label="Close"></span></div><div class="modal-dialog-content"><div class="zm-light-box-x1" id="zm-light-box-x1"><div class="zm-light-box-x2" id="zm-light-box-x2" style="margin-top: 40px; width: 500px;"><img src="{0}" class="zm-light-box-img-el"><div class="zm-light-box-footer"><a class="zm-light-box-show-origin" href="{1}" target="_blank">查看原图</a></div></div></div></div><div class="modal-dialog-buttons"><button name="cancel">取消</button><button name="ok" class="goog-buttonset-default">确定</button></div></div>';
 
 // "点击放大"按钮HTML
-var btnTpl = '<div style="position: absolute; z-index: 999; padding: 0 !important" class="modal-dialog-buttons"><button name="ok" class="goog-buttonset-default">点击放大</button></div>';
+var btnTpl = '<div style="position: absolute; z-index: 999; padding: 0 !important" class="modal-dialog-buttons"><button name="false" id="false" class="goog-buttonset-default">取消</button><<button name="ok" id="ok" class="goog-buttonset-default">放大</button></div>';
 
 var body = $(document.body);
 var mask = $(maskTpl).hide().appendTo(body); // 创建蒙板
@@ -39,7 +39,7 @@ var avatarHoverHandler = function(arguments) {
         var offset = img.offset();
         
         imgUrl = img.attr('src').replace((/_\w\./), '.');
-        
+         
         btn.show().offset({
             left: offset.left + (img.width() - btnWidth) / 2,
             top: offset.top + img.height() + 5
@@ -48,9 +48,9 @@ var avatarHoverHandler = function(arguments) {
 /*    $('.avatar img, img.avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50').mouseout(function(){
         btn.hide();
     })*/
-    avatars.off('mouseout').on('mouseout',function(e){
+/*    $('img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50,button.goog-buttonset-default,div.zh-profile-card ,div.modal-dialog-buttons').off('mouseleave').on('mouseleave ',function(e){
         btn.hide();
-    });
+    });*/
 };
 var HaveHandler=function(arguments){
     var avatars = $('.avatar img, img.avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50');
@@ -73,12 +73,15 @@ var HaveHandler=function(arguments){
 })();
 
 // 鼠标点击"点击放大"按钮事件的监听函数：弹窗显示大图
-btn.on('click', function() {
+btn.on('click', "#ok",function() {
     img.attr('src', '').attr('src', imgUrl);
     link.attr('href', imgUrl);
     btn.hide();
     mask.show();
     win.show();
+});
+btn.on('click', "#false",function() {
+    btn.hide();
 });
 
 // 点击图片弹窗事件事件的监听函数：隐藏弹窗
