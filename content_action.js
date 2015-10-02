@@ -31,10 +31,9 @@ var imgUrl = '';
 var btn = $(btnTpl).hide().appendTo(body);
 var btnWidth = btn.width();
 
-// 鼠标移入头像图片事件的监听函数
-var avatarHoverHandler = function(arguments) {
-    var avatars = $('.avatar img, img.avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50');
-    avatars.off('mouseover').on('mouseover', function(e) {
+(function() {
+    var avatarSelector = '.avatar img, img.avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50';
+    $(document).on('mouseover', avatarSelector, function(e) {
         var img = $(this);
         var offset = img.offset();
 
@@ -44,21 +43,6 @@ var avatarHoverHandler = function(arguments) {
             left: offset.left + (img.width() - btnWidth) / 2,
             top: offset.top + img.height() + 5
         });
-    });
-};
-
-// 知乎首页动态插入节点(新动态)事件的监听函数：为所有头像图片的鼠标移入事件注册监听器
-(function() {
-    var ts0 = -1;
-    $('#js-home-feed-list').on('DOMNodeInserted', function(){
-        var ts = new Date().getTime();
-
-        // 防止一次插入多个节点时触发多次注册动作
-        if (ts - ts0 >= 500) {
-            setTimeout(avatarHoverHandler); // 加入到事件队列的末尾
-        }
-
-        ts0 = ts;
     });
 })();
 
@@ -81,6 +65,3 @@ win.on('click', function() {
     mask.hide();
     win.hide();
 });
-
-// 首次载入脚本时触发一次avatarHoverHandler
-avatarHoverHandler();
