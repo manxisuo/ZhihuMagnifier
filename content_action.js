@@ -30,6 +30,7 @@ var imgUrl = '';
 // 创建"点击放大"按钮
 var btn = $(btnTpl).hide().appendTo(body);
 var btnWidth = btn.width();
+var btnHideTimer = null;
 
 (function() {
     var avatarSelector = '.avatar img, img.avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50';
@@ -43,6 +44,16 @@ var btnWidth = btn.width();
             left: offset.left + (img.width() - btnWidth) / 2,
             top: offset.top + img.height() + 5
         });
+    });
+
+    // 鼠标移出avatarSelector事件的监听函数：使用一个Timer来隐藏"点击放大"按钮
+    $(document).on('mouseout', avatarSelector, function(e) {
+        if (btnHideTimer == null) {
+            btnHideTimer = setTimeout(function() {
+                btn.hide();
+                btnHideTimer = null;
+            }, 500);
+        }
     });
 })();
 
@@ -58,6 +69,14 @@ btn.on('click', function() {
 // 鼠标移出"点击放大"按钮事件的监听函数：隐藏按钮
 btn.on('mouseout', function() {
     btn.hide();
+});
+
+// 鼠标移入"点击放大"按钮事件的监听函数：清除隐藏按钮的Timer
+btn.on('mouseover', function() {
+    if (btnHideTimer) {
+        clearTimeout(btnHideTimer);
+        btnHideTimer = null;
+    }
 });
 
 // 点击图片弹窗事件事件的监听函数：隐藏弹窗
