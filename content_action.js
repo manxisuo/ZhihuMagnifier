@@ -13,10 +13,10 @@ var format = (function() {
 var maskTpl = '<div class="modal-dialog-bg zm-light-box-background" style="opacity: 0.5; width: 100%; height: 100%;" aria-hidden="true"></div>';
 
 // 图片弹窗HTML
-var winTpl = '<div class="modal-dialog zm-light-box zm-light-box-fullscreen-image" tabindex="0" role="dialog" aria-labelledby=":9h"><div class="modal-dialog-title modal-dialog-title-draggable"><span class="modal-dialog-title-text" id=":9h" role="heading"></span><span class="modal-dialog-title-close" role="button" tabindex="0" aria-label="Close"></span></div><div class="modal-dialog-content"><div class="zm-light-box-x1" id="zm-light-box-x1"><div class="zm-light-box-x2" id="zm-light-box-x2" style="margin-top: 80px;"><img src="{0}" class="zm-light-box-img-el"><div class="zm-light-box-footer"><a class="zm-light-box-show-origin" href="{1}" target="_blank">查看原图</a></div></div></div></div><div class="modal-dialog-buttons"><button name="cancel">取消</button><button name="ok" class="goog-buttonset-default">确定</button></div></div>';
+var winTpl = '<div class="modal-dialog zm-light-box zm-light-box-fullscreen-image" tabindex="0" role="dialog" aria-labelledby=":9h" style="top:0;width: 100%;background-color: transparent"><div class="modal-dialog-title modal-dialog-title-draggable" style="display:none"><span class="modal-dialog-title-text" id=":9h" role="heading"></span><span class="modal-dialog-title-close" role="button" tabindex="0" aria-label="Close"></span></div><div class="modal-dialog-content"><div class="zm-light-box-x1" style="text-align:center" id="zm-light-box-x1"><div class="zm-light-box-x2" id="zm-light-box-x2" style="margin-top: 80px;"><img src="{0}" class="zm-light-box-img-el"><div class="zm-light-box-footer"><a class="zm-light-box-show-origin" href="{1}" target="_blank">查看原图</a></div></div></div></div><div class="modal-dialog-buttons"><button name="cancel">取消</button><button name="ok" class="goog-buttonset-default">确定</button></div></div>';
 
 // "点击放大"按钮HTML
-var btnTpl = '<div style="position: absolute; z-index: 999; padding: 0 !important" class="modal-dialog-buttons"><button name="ok" class="goog-buttonset-default">点击放大</button></div>';
+var btnTpl = '<div style="position: absolute; z-index: 999; padding: 0 !important; left: 1px; right: auto" class="modal-dialog-buttons"><button style="margin: 0" name="ok" class="goog-buttonset-default">点击放大</button></div>';
 
 var body = $(document.body);
 var mask = $(maskTpl).hide().appendTo(body); // 创建蒙板
@@ -33,12 +33,12 @@ var btnWidth = btn.width();
 var btnHideTimer = null;
 
 (function() {
-    var avatarSelector = '.avatar img, img.avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50';
+    var avatarSelector = '.avatar img, img.avatar, img.Avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50';
     $(document).on('mouseover', avatarSelector, function(e) {
         var img = $(this);
         var offset = img.offset();
 
-        imgUrl = img.attr('src').replace((/_\w\./), '.');
+        imgUrl = img.attr('src').replace((/_\w\w?\./), '.');
 
         btn.show().offset({
             left: offset.left + (img.width() - btnWidth) / 2,
