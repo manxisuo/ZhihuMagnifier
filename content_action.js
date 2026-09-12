@@ -120,13 +120,34 @@
     }
 
     function parseBestSrcsetCandidate(srcset) {
-        var parts = srcset.split(',').map(function(part) {
-            return part.trim();
-        }).filter(Boolean);
+        var candidates = srcset.split(',').map(function(part) {
+            var bits = part.trim().split(/\s+/);
+            var descriptor = (bits[1] || '').match(/^([\d.]+)(w|x)$/i);
 
-        if (!parts.length) return '';
+            return {
+                url: bits[0] || '',
+                value: descriptor ? parseFloat(descriptor[1]) : 0,
+                unit: descriptor ? descriptor[2].toLowerCase() : ''
+            };
+        }).filter(function(candidate) {
+            return candidate.url;
+        });
 
-        return parts[parts.length - 1].split(/\s+/)[0] || '';
+        if (!candidates.length) return '';
+
+        var pickUnit = function(unit) {
+            return candidates.filter(function(candidate) {
+                return candidate.unit === unit;
+            });
+        };
+        // w 描述符优先于 x（同一 srcset 里两者互斥）；都没有描述符时退回最后一项。
+        var widths = pickUnit('w');
+        var densities = pickUnit('x');
+        var pool = widths.length ? widths : (densities.length ? densities : candidates);
+
+        return pool.reduce(function(best, candidate) {
+            return candidate.value >= best.value ? candidate : best;
+        }).url;
     }
 
     function getOriginalAvatarUrl(src) {
@@ -134,14 +155,14 @@
 
         try {
             var url = new URL(src, window.location.href);
-            var originalPath = url.pathname
-                .replace(/_[a-z0-9]{1,20}(?=\.[a-z0-9]{3,5}$)/i, '')
-                .replace(/_(?:hd|xl|l|m|s|xs)(?=\.[a-z0-9]{3,5}$)/i, '');
 
-            url.pathname = originalPath;
+            // 只剥离知乎已知的尺寸标记，避免把 avatar_2023.jpg 这类真实文件名也削掉。
+            url.pathname = url.pathname
+                .replace(/_(?:hd|xll|xl|xs|b|l|m|s)(?=\.[a-z0-9]{3,5}$)/i, '');
+
             return url.href;
         } catch (e) {
-            return src.replace(/_[a-z0-9]{1,20}\.(?=[a-z0-9]{3,5}(?:\?|$))/i, '.');
+            return src.replace(/_(?:hd|xll|xl|xs|b|l|m|s)\.(?=[a-z0-9]{3,5}(?:\?|$))/i, '.');
         }
     }
 

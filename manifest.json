@@ -3,7 +3,7 @@
 
   "name": "知乎头像放大器",
   "description": "查看知乎用户头像的原始尺寸图片",
-  "version": "1.2.6",
+  "version": "1.2.7",
 
   "content_scripts": [{
     "matches": ["https://*.zhihu.com/*"],
