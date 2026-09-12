@@ -11,6 +11,7 @@
     var btnHideTimer = null;
     var activeAvatar = null;
     var lastPointerType = '';
+    var btnWidth = 0;
 
     var mask = createElement('<div id="zhmag-mask" class="zhmag-mask" aria-hidden="true"></div>');
     var modal = createElement([
@@ -170,7 +171,9 @@
         var rect = image.getBoundingClientRect();
         show(btn);
 
-        var btnWidth = btn.offsetWidth || 0;
+        // 按钮尺寸固定，首次测量后缓存，避免每次 hover 读 offsetWidth 触发强制重排。
+        if (!btnWidth) btnWidth = btn.offsetWidth;
+
         var left = window.scrollX + rect.left + (rect.width - btnWidth) / 2;
         var top = window.scrollY + rect.bottom + 5;
 
@@ -206,6 +209,9 @@
 
     function closestAvatar(target) {
         if (!target || target.nodeType !== Node.ELEMENT_NODE) return null;
+        // AVATAR_SELECTOR 各项都以 img 结尾，且 img 是空元素（无子节点），
+        // 所以非 IMG 的 target 不可能命中，可省掉整趟 closest() 祖先遍历。
+        if (target.tagName !== 'IMG') return null;
 
         return target.closest(AVATAR_SELECTOR);
     }
@@ -222,6 +228,9 @@
     }
 
     function showImageError() {
+        // closeModal 移除 src 可能异步派发一次 error，忽略它以免误标下一次打开的图片。
+        if (!img.getAttribute('src')) return;
+
         hide(img);
         hide(footer);
         show(status);
@@ -299,7 +308,7 @@
 
     window.addEventListener('scroll', function() {
         hide(btn);
-    });
+    }, { passive: true });
     window.addEventListener('resize', function() {
         if (activeAvatar && btn.style.display !== 'none') {
             positionButton(activeAvatar);
