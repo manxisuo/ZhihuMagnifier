@@ -19,9 +19,9 @@
         '  <div class="zhmag-modal-inner" role="document">',
         '    <button type="button" class="zhmag-close" aria-label="Close">×</button>',
         '    <div class="zhmag-status" aria-live="polite">图片加载中...</div>',
-        '    <img class="zhmag-img" src="" alt="avatar">',
+        '    <img class="zhmag-img" alt="avatar">',
         '    <div class="zhmag-footer">',
-        '      <a class="zhmag-origin" href="" target="_blank" rel="noreferrer noopener">查看原图</a>',
+        '      <a class="zhmag-origin" target="_blank" rel="noreferrer noopener">查看原图</a>',
         '    </div>',
         '  </div>',
         '</div>'
