@@ -4,14 +4,16 @@
 
     var AVATAR_SELECTOR = '.avatar img, img.avatar, img.Avatar, img.zm-item-img-avatar, img.zm-list-avatar, img.zm-item-img-avatar50, img.Avatar-hemingway';
     var HIDE_DELAY = 500;
-    var touchLikeInput = navigator.maxTouchPoints > 0 ||
-        (window.matchMedia && window.matchMedia('(hover: none), (pointer: coarse)').matches);
+    var LONG_PRESS_DELAY = 500;
+    var LONG_PRESS_MOVE_TOLERANCE = 10;
 
     var imgUrl = '';
     var btnHideTimer = null;
     var activeAvatar = null;
-    var lastPointerType = '';
     var btnWidth = 0;
+    var suppressNextClick = false;
+    var pressTimer = null;
+    var pressStart = null;
 
     var mask = createElement('<div id="zhmag-mask" class="zhmag-mask" aria-hidden="true"></div>');
     var modal = createElement([
@@ -216,9 +218,24 @@
         return target.closest(AVATAR_SELECTOR);
     }
 
-    function shouldOpenFromAvatarClick() {
-        return lastPointerType === 'touch' || lastPointerType === 'pen' ||
-            (!lastPointerType && touchLikeInput);
+    function clearPressTimer() {
+        if (pressTimer === null) return;
+
+        window.clearTimeout(pressTimer);
+        pressTimer = null;
+        pressStart = null;
+    }
+
+    function startLongPress(image, event) {
+        pressStart = { x: event.clientX, y: event.clientY };
+        pressTimer = window.setTimeout(function() {
+            pressTimer = null;
+            pressStart = null;
+            if (!document.contains(image) || !prepareAvatar(image)) return;
+
+            suppressNextClick = true;
+            openModal(imgUrl);
+        }, LONG_PRESS_DELAY);
     }
 
     function showLoadedImage() {
@@ -238,10 +255,28 @@
     }
 
     document.addEventListener('pointerdown', function(event) {
-        if (!closestAvatar(event.target)) return;
+        // 每次按下都重置，避免上一次长按遗留的抑制标记吃掉无关点击。
+        suppressNextClick = false;
+        clearPressTimer();
 
-        lastPointerType = event.pointerType || '';
+        // 只有没有 hover 的指针走长按；鼠标仍然用悬停按钮。
+        if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
+
+        var image = closestAvatar(event.target);
+        if (image) startLongPress(image, event);
     }, true);
+
+    document.addEventListener('pointermove', function(event) {
+        if (pressTimer === null || !pressStart) return;
+
+        if (Math.abs(event.clientX - pressStart.x) > LONG_PRESS_MOVE_TOLERANCE ||
+            Math.abs(event.clientY - pressStart.y) > LONG_PRESS_MOVE_TOLERANCE) {
+            clearPressTimer();
+        }
+    }, { capture: true, passive: true });
+
+    document.addEventListener('pointerup', clearPressTimer, true);
+    document.addEventListener('pointercancel', clearPressTimer, true);
 
     document.addEventListener('mouseover', function(event) {
         var image = closestAvatar(event.target);
@@ -260,15 +295,17 @@
     });
 
     document.addEventListener('click', function(event) {
-        if (!shouldOpenFromAvatarClick()) return;
+        // 长按松手后浏览器仍会派发一次 click，这里把它彻底吞掉：既阻止跳转，
+        // 也避免遮罩或弹层把它当成一次关闭操作。
+        if (suppressNextClick) {
+            suppressNextClick = false;
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
 
-        var image = closestAvatar(event.target);
-        if (!image || !document.contains(image)) return;
-        if (!prepareAvatar(image)) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-        openModal(imgUrl);
+        // 触摸点按会合成 mouseover 弹出悬停按钮，点按结束后要收起它。
+        hide(btn);
     }, true);
 
     btn.addEventListener('click', function() {
